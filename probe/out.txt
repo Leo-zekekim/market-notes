@@ -1,0 +1,28 @@
+## krx
+ERROR HTTP Error 400: Bad Request
+
+## naver_sise_quant
+status 200 len 131332
+<!DOCTYPE html><html lang="ko" class="" data-theme="light"><head><meta charSet="utf-8"/><meta name="viewport" content="width=1366, initial-scale=1.0, user-scalable=yes"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="https://ssl.pstatic.net/imgstock/fn/real/pc/_next/static/css/9349f3b462cc41d1.css" data-precedence="next"/><link rel="stylesheet" href="https://ssl.pstatic.net/imgstock/fn/real/pc/_next/static/css/5b7b19cfec1ddb73.css" data-precedence="next"/><link rel="stylesheet" href="https://ssl.pstatic.net/imgstock/fn/real/pc/_next/static/css
+
+## naver_m_quantTop
+status 200 len 5025
+{"stockListSortType":"QUANT_TOP","stockListCategoryType":"KOSPI","stocks":[{"stockType":"domestic","stockEndType":"etf","itemCode":"252670","reutersCode":"252670","stockName":"KODEX 200선물인버스2X","sosok":"0","closePrice":"104","compareToPreviousClosePrice":"-8","compareToPreviousPrice":{"code":"5","text":"하락","name":"FALLING"},"fluctuationsRatio":"-7.14","accumulatedTradingVolume":"10,090,978,365","accumulatedTradingValue":"1,032,152","accumulatedTradingValueKrwHangeul":"1조 322억원","localTradedAt":"2026-10-27T19:05:23+09:00","marketValue":"8,697","marketValueHangeul":"8,697억
+
+## naver_m_amountTop
+ERROR HTTP Error 404: 404
+
+## naver_m_priceTop
+status 200 len 5924
+{"stockListSortType":"PRICE_TOP","stockListCategoryType":"KOSPI","stocks":[{"stockType":"domestic","stockEndType":"stock","itemCode":"000660","reutersCode":"000660","stockName":"SK하이닉스","sosok":"0","closePrice":"1,366,000","compareToPreviousClosePrice":"91,000","compareToPreviousPrice":{"code":"2","text":"상승","name":"RISING"},"fluctuationsRatio":"7.14","accumulatedTradingVolume":"2,930,150","accumulatedTradingValue":"3,973,114","accumulatedTradingValueKrwHangeul":"3조 9,731억원","localTradedAt":"2026-10-27T19:05:24+09:00","marketValue":"9,978,526","marketValueHangeul":"997조 8,
+
+## naver_m_up
+status 200 len 5365
+{"stockListSortType":"UP","stockListCategoryType":"KOSPI","stocks":[{"stockType":"domestic","stockEndType":"stock","itemCode":"308170","reutersCode":"308170","stockName":"씨티알모빌리티","sosok":"0","closePrice":"4,225","compareToPreviousClosePrice":"955","compareToPreviousPrice":{"code":"2","text":"상승","name":"RISING"},"fluctuationsRatio":"29.20","accumulatedTradingVolume":"244,065","accumulatedTradingValue":"932","accumulatedTradingValueKrwHangeul":"9.32억원","localTradedAt":"2026-10-27T19:05:21+09:00","marketValue":"364","marketValueHangeul":"364억원","nav":"N/A","threeMonthE
+
+## naver_m_marketValue
+status 200 len 5927
+{"stockListSortType":"MARKET_VALUE","stockListCategoryType":"KOSPI","stocks":[{"stockType":"domestic","stockEndType":"stock","itemCode":"005930","reutersCode":"005930","stockName":"삼성전자","sosok":"0","closePrice":"223,500","compareToPreviousClosePrice":"10,500","compareToPreviousPrice":{"code":"2","text":"상승","name":"RISING"},"fluctuationsRatio":"4.93","accumulatedTradingVolume":"13,667,876","accumulatedTradingValue":"3,044,167","accumulatedTradingValueKrwHangeul":"3조 442억원","localTradedAt":"2026-10-27T19:05:22+09:00","marketValue":"13,066,433","marketValueHangeul":"1,306조 6
+
+## naver_m_domestic_amount
+ERROR HTTP Error 404: 404

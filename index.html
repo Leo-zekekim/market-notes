@@ -46,6 +46,11 @@ main{min-width:0;display:flex;flex-direction:column;gap:28px}
 .dateline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .dateline h2{margin:0;font-size:28px;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
 .dateline .wd{color:var(--muted);font-size:15px}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.badge.pre{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.badge.closed{background:var(--ink);color:var(--bg);border-color:transparent}
+.updated{font-size:12px;color:var(--muted)}
+.rail .pre{font-size:11px;color:var(--accent)}
 .verdict{margin:0;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:4px;max-width:72ch}
 .verdict b{color:var(--accent);margin-right:6px}
 /* ticker board */
@@ -137,7 +142,7 @@ function renderRail(){
   $("#dates").innerHTML = reports.map(r=>{
     const k = (r.indices||[]).find(i=>i.name==="코스피");
     const [,m,d] = r.id.split("-");
-    return `<li><button data-id="${esc(r.id)}" aria-current="${r.id===current}"><span class="num">${+m}.${+d}</span>${k?`<span class="pct num ${dir(k.pct)}">${sign(k.pct)}${fmt(k.pct)}%</span>`:""}</button></li>`;
+    return `<li><button data-id="${esc(r.id)}" aria-current="${r.id===current}"><span class="num">${+m}.${+d}</span>${r.status==="premarket"?`<span class="pre">장 시작 전</span>`:k?`<span class="pct num ${dir(k.pct)}">${sign(k.pct)}${fmt(k.pct)}%</span>`:""}</button></li>`;
   }).join("");
   $("#count").textContent = reports.length ? `총 ${reports.length}건` : "";
 }
@@ -184,8 +189,9 @@ function renderReport(){
   const fx=r.fx;
   const flows=r.flows||{};
   $("#main").innerHTML = `
-    <div class="dateline"><h2>${d.txt}</h2><span class="wd">${d.wd} 장마감</span></div>
-    ${r.summary?`<p class="verdict"><b>총평</b>${esc(r.summary)}</p>`:""}
+    <div class="dateline"><h2>${d.txt}</h2><span class="wd">${d.wd}</span>${r.status==="premarket"?`<span class="badge pre">장 시작 전</span>`:`<span class="badge closed">장 마감</span>`}${r.updatedAt?`<span class="updated">${esc(r.updatedAt)} 업데이트</span>`:""}</div>
+    ${r.summary?`<p class="verdict"><b>${r.status==="premarket"?"개장 전 요약":"총평"}</b>${esc(r.summary)}</p>`:""}
+    ${(r.preview||[]).length?`<section><h3>오늘의 관전 포인트</h3><ul class="points">${r.preview.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`:""}
     <div class="board">
       ${idx.map(i=>`<div class="tick"><div class="nm"><span>${esc(i.name)}</span>${i.region==="US"?"<em>미국</em>":""}</div>
         <div class="cl num">${fmt(i.close)}</div>
@@ -198,15 +204,15 @@ function renderReport(){
       <div id="chart">${trendSVG(trendKey)}</div>
     </section>
     <div class="grid2">
-      <section><h3>코스피 수급 (억원)</h3>${flowBlock(flows.kospi, flows.kosdaqNote)}</section>
+      <section><h3>코스피 수급 (억원)</h3>${flowBlock(flows.kospi, flows.kosdaqNote)||`<div class="news-empty">장 마감 후 업데이트됩니다.</div>`}</section>
       <section><h3>미국 증시 동향</h3><ul class="points">${(r.usNotes||[]).map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>
     </div>
     <div class="grid2">
-      <section><h3>코스피 거래대금 상위</h3>${stockTable((r.stocks||{}).kospi)}</section>
-      <section><h3>코스닥 거래대금 상위</h3>${stockTable((r.stocks||{}).kosdaq)}</section>
+      <section><h3>코스피 거래대금 상위</h3>${stockTable((r.stocks||{}).kospi)||`<div class="news-empty">장 마감 후 업데이트됩니다.</div>`}</section>
+      <section><h3>코스닥 거래대금 상위</h3>${stockTable((r.stocks||{}).kosdaq)||`<div class="news-empty">장 마감 후 업데이트됩니다.</div>`}</section>
     </div>
     ${(r.global||[]).length?`<section><h3>글로벌 지수</h3><div class="tbl"><table><thead><tr><th>지수</th><th class="r">종가</th><th class="r">등락률</th></tr></thead><tbody>${r.global.map(g=>`<tr><td>${esc(g.name)}</td><td class="r num">${fmt(g.close,0)}</td><td class="r num ${dir(g.pct)}">${sign(g.pct)}${fmt(g.pct)}%</td></tr>`).join("")}</tbody></table></div></section>`:""}
-    <section><h3>시사점 및 특이사항</h3><ul class="points">${(r.insights||[]).map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>
+    ${(r.insights||[]).length?`<section><h3>시사점 및 특이사항</h3><ul class="points">${r.insights.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`:""}
     <section><h3>경제 뉴스</h3>${(r.news||[]).length?`<div class="news">${r.news.map(n=>`<div>${n.url?`<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>`:`<b>${esc(n.title)}</b>`}<div class="meta">${esc(n.source||"")}</div>${n.summary?`<div>${esc(n.summary)}</div>`:""}</div>`).join("")}</div>`:`<div class="news-empty">이 날짜에는 뉴스 항목이 없습니다. 다음 리포트부터 주요 경제 뉴스가 함께 올라옵니다.</div>`}</section>
     ${(r.sources||[]).length?`<p class="src">출처: ${r.sources.map(esc).join(" · ")}</p>`:""}
   `;

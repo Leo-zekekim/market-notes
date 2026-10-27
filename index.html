@@ -240,12 +240,12 @@ function seriesSVG(pts, unit){
   const ticks=[0,.25,.5,.75,1].map(t=>lo+(hi-lo)*t);
   const line=pts.map((p,i)=>`${i?"L":"M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
   const last=pts[pts.length-1];
-  const months=[];let seen="";
-  for(const p of pts){const m=p[0].slice(0,7);if(m!==seen){seen=m;months.push(p[0]);}}
-  const step=Math.ceil(months.length/6);
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="1년 추이">
+  const months=[];
+  for(let t=t0;t<=t1;t+=14*864e5) months.push(new Date(t).toISOString().slice(0,10));
+  const step=Math.ceil(months.length/7);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="3개월 추이">
     ${ticks.map(t=>`<line x1="${pl}" x2="${W-pr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="1"/><text x="${pl-8}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${fmt(t,dec)}</text>`).join("")}
-    ${months.map((d,i)=>i%step===0?`<text x="${x(d)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${d.slice(2,4)}.${+d.slice(5,7)}</text>`:"").join("")}
+    ${months.map((d,i)=>i%step===0?`<text x="${x(d)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${+d.slice(5,7)}/${+d.slice(8,10)}</text>`:"").join("")}
     <path d="${line}L${x(last[0])},${H-pb}L${x(pts[0][0])},${H-pb}Z" fill="var(--accent)" opacity=".08"/>
     <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linejoin="round"/>
     <circle cx="${x(last[0])}" cy="${y(last[1])}" r="4" fill="var(--accent)"/>
@@ -257,9 +257,10 @@ function longBlock(){
   if(!keys.length) return "";
   if(!keys.includes(longKey)) longKey=keys[0];
   const s=macroData.series[longKey];
-  const pts=s.points.filter(p=>p[0]<=current);
+  const from=new Date(Date.parse(current)-92*864e5).toISOString().slice(0,10);
+  const pts=s.points.filter(p=>p[0]<=current&&p[0]>=from);
   const last=pts[pts.length-1];
-  return `<section class="trend" id="long"><h3>지표 1년 추이</h3>
+  return `<section class="trend" id="long"><h3>지표 3개월 추이</h3>
     <div class="tabs">${keys.map(k=>`<button data-l="${k}" aria-pressed="${k===longKey}">${esc(macroData.series[k].name)}</button>`).join("")}</div>
     <div id="longchart">${seriesSVG(pts,s.unit)}</div>
     <p class="src">출처: ${SRC[s.source]||s.source}${last?` · 최근 ${last[0]} ${fmt(last[1],s.unit==="%"?3:2)}${s.unit&&s.unit!=="$"?s.unit:""}`:""} · 자동 수집 ${esc(macroData.updatedAt||"")}</p>

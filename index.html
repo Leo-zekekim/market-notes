@@ -218,7 +218,10 @@ function macroAsOf(dateId){
   return out;
 }
 function mergedMacro(r){
-  const api=macroAsOf(r.id);
+  // 공식 값이 리포트 날짜보다 3일 넘게 오래됐고 리포트에 같은 지표가 있으면 리포트 값을 쓴다
+  const rep=new Map((r.macro||[]).map(m=>[m.name,m]));
+  const cutoff=new Date(Date.parse(r.id)-3*864e5).toISOString().slice(0,10);
+  const api=macroAsOf(r.id).map(m=>(m.date<cutoff&&rep.has(m.name))?rep.get(m.name):m);
   const names=new Set(api.map(m=>m.name));
   const extra=(r.macro||[]).filter(m=>!names.has(m.name));
   return api.concat(extra);

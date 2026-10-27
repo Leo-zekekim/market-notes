@@ -45,7 +45,7 @@ GitHub Actions(`scripts/fetch_macro.py`)가 한국은행 ECOS·FRED·CoinGecko�
 - `fx`: 오늘 원/달러 종가로 갱신
 - `flows.kospi`: 외국인, 기관, 개인, 프로그램 순매수(억원) `{investor, amount}`
 - `flows.kosdaqNote`: 코스닥 수급 한 줄 요약
-- `stocks.kospi`, `stocks.kosdaq`: 거래대금 상위 5종목 `{name, code, price, pct}`
+- `stocks`: 넣지 않아도 된다. 거래대금 상위 종목은 GitHub Actions(`scripts/fetch_stocks.py`)가 네이버 증권에서 자동 수집해 `data/top_stocks.json`에 저장하고 사이트가 이를 표시한다. 자동 수집이 실패한 날에만 웹에서 확인한 상위 3종목을 `{name, code, price, pct}`로 넣는다.
 - `insights`: 시사점 및 특이사항 4~7개
 - `news`: 장중에 나온 중요한 뉴스가 있으면 추가 (총 8개 이내)
 - `sources`: 갱신

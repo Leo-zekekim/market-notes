@@ -139,7 +139,7 @@ const dir = n => n>0?"up":n<0?"down":"flat";
 const sign = n => n>0?"+":"";
 const arrow = n => n>0?"▲":n<0?"▼":"–";
 const WD = ["일","월","화","수","목","금","토"];
-let reports = [], current = null, trendKey = "코스피", macroData = null, longKey = "kr3y";
+let reports = [], current = null, trendKey = "코스피", macroData = null, longKey = "kr3y", topStocks = {};
 
 function longDate(id){const [y,m,d]=id.split("-").map(Number);const w=WD[new Date(y,m-1,d).getDay()];return {txt:`${y}년 ${m}월 ${d}일`,wd:`${w}요일`};}
 
@@ -180,10 +180,14 @@ function flowBlock(rows, foot){
     ${foot?`<div class="foot">${esc(foot)}</div>`:""}</div>`;
 }
 
+function tv(v){ if(v==null) return "–"; return v>=1e6 ? `${fmt(v/1e6,2)}조` : `${fmt(Math.round(v/100),0)}억`; }
+function stockRows(r,key){ return ((topStocks[r.id]||{})[key]) || ((r.stocks||{})[key]) || []; }
 function stockTable(rows){
-  if(!rows||!rows.length) return "";
-  return `<div class="tbl"><table><thead><tr><th>종목</th><th class="r">현재가</th><th class="r">등락률</th></tr></thead><tbody>${rows.map(s=>
-    `<tr><td>${esc(s.name)}<span class="code num">${esc(s.code)}</span></td><td class="r num">${fmt(s.price,0)}</td><td class="r num ${dir(s.pct)}">${sign(s.pct)}${fmt(s.pct)}%</td></tr>`).join("")}</tbody></table></div>`;
+  rows=(rows||[]).slice(0,3);
+  if(!rows.length) return "";
+  const hasTv=rows.some(s=>s.tradingValue!=null);
+  return `<div class="tbl"><table><thead><tr><th>종목</th><th class="r">종가</th><th class="r">등락률</th>${hasTv?`<th class="r">거래대금</th>`:""}</tr></thead><tbody>${rows.map(s=>
+    `<tr><td>${esc(s.name)}<span class="code num">${esc(s.code)}</span></td><td class="r num">${fmt(s.price,0)}</td><td class="r num ${dir(s.pct)}">${sign(s.pct)}${fmt(s.pct)}%</td>${hasTv?`<td class="r num">${tv(s.tradingValue)}</td>`:""}</tr>`).join("")}</tbody></table></div>`;
 }
 
 function macroTick(m){
@@ -296,8 +300,8 @@ function renderReport(){
       <section><h3>미국 증시 동향</h3><ul class="points">${(r.usNotes||[]).map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>
     </div>
     <div class="grid2">
-      <section><h3>코스피 거래대금 상위</h3>${stockTable((r.stocks||{}).kospi)||emptyNote(r)}</section>
-      <section><h3>코스닥 거래대금 상위</h3>${stockTable((r.stocks||{}).kosdaq)||emptyNote(r)}</section>
+      <section><h3>코스피 거래대금 상위 3</h3>${stockTable(stockRows(r,"kospi"))||emptyNote(r)}</section>
+      <section><h3>코스닥 거래대금 상위 3</h3>${stockTable(stockRows(r,"kosdaq"))||emptyNote(r)}</section>
     </div>
     ${(r.global||[]).length?`<section><h3>글로벌 지수</h3><div class="tbl"><table><thead><tr><th>지수</th><th class="r">종가</th><th class="r">등락률</th></tr></thead><tbody>${r.global.map(g=>`<tr><td>${esc(g.name)}</td><td class="r num">${fmt(g.close,0)}</td><td class="r num ${dir(g.pct)}">${sign(g.pct)}${fmt(g.pct)}%</td></tr>`).join("")}</tbody></table></div></section>`:""}
     ${(r.insights||[]).length?`<section><h3>시사점 및 특이사항</h3><ul class="points">${r.insights.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`:""}
@@ -320,12 +324,14 @@ window.addEventListener("hashchange",()=>{const h=location.hash.slice(2);if(repo
 (async()=>{
   try{
     const macroP = fetch("data/macro.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);
+    const stocksP = fetch("data/top_stocks.json",{cache:"no-store"}).then(r=>r.ok?r.json():{}).catch(()=>({}));
     const idx = await (await fetch("reports/index.json",{cache:"no-store"})).json();
     const ids = (idx.reports||[]).slice().sort().reverse();
     reports = (await Promise.all(ids.map(id=>fetch(`reports/${id}.json`,{cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null)))).filter(Boolean).map(r=>({id:r.date,...r}));
     const h=location.hash.slice(2);
     current = reports.some(r=>r.id===h)?h:(reports[0]?.id??null);
     macroData = await macroP;
+    topStocks = (await stocksP) || {};
     render();
   }catch(e){
     $("#main").innerHTML=`<div class="state"><h2>리포트를 불러오지 못했습니다</h2><p>잠시 후 새로고침해 주세요.</p></div>`;

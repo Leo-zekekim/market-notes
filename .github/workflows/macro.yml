@@ -1,4 +1,4 @@
-name: 주요 지표 수집
+name: 주요 지표·거래대금 상위 수집
 
 on:
   schedule:
@@ -30,12 +30,18 @@ jobs:
           ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/fetch_macro.py
+        continue-on-error: true
+
+      - name: 거래대금 상위 종목 받기
+        run: python scripts/fetch_stocks.py
+        continue-on-error: true
 
       - name: 변경 사항 저장
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/macro.json
+          git add data/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "변경 없음"
             exit 0

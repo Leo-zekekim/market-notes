@@ -11,6 +11,10 @@
 - `reports/index.json`의 `reports` 배열에 오늘 날짜가 없으면 추가한다(중복 금지).
 - `updatedAt`에는 "HH:MM" 형식의 한국 시간을 넣는다.
 - JSON이 올바른지 확인한 뒤 커밋하고 `main`에 push한다.
+- push한 뒤 지표·거래대금 자동 수집을 직접 실행시킨다 (GitHub 예약 실행은 몇 시간씩 늦을 수 있다):
+  - 장 시작 전: `gh api -X POST repos/Leo-zekekim/market-notes/actions/workflows/macro.yml/dispatches -f ref=main -f "inputs[stocks]=false"`
+  - 장 마감 후: `gh api -X POST repos/Leo-zekekim/market-notes/actions/workflows/macro.yml/dispatches -f ref=main -f "inputs[stocks]=true"`
+  - 실행 요청이 실패해도 리포트 작업은 실패로 보지 않는다. 결과 보고에 실패 사실만 한 줄 적는다.
 
 ## 주요 지표 (`macro`)
 국고채 3년·10년, 기준금리, 원/달러, 미 국채 2년·10년, 연방기금금리, 달러지수(광의), WTI, 브렌트유, VIX, 비트코인은
